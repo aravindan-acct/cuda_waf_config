@@ -1,0 +1,97 @@
+---
+### Based on Barracuda WAF REST API version 3###
+### This playbook can be used to setup a service using the Barracuda WAF REST APIv3,
+### while also creating the complementing configuration by adding a security policy, a web scraping policy and 
+### a URL policy that binds the web scraping policy. 
+### when the username and password is provided in the script
+
+### WAF DETAILS ###
+- hosts: localhost
+  tasks:
+  - name: Set WAF URL
+    set_fact:
+      waf_url: '18.144.35.223:8000/restapi/v3'
+      #service_name: 'Service_08'
+      #service_ip: '10.36.73.222'
+      #service_port: '1111'
+      #server_ip: '10.36.73.242'
+      #server_port: '80'
+      waf_user: 'admin'
+      waf_password: 'se_training2019!!!'
+      dst_dir: '/users/aravindan/Documents/Dev-Tools/cuda_waf_config/'
+
+### WAF LOGIN TOKEN GENERATION ###
+  - name: Getting the login token
+    uri:
+      url: http://{{ waf_url }}/login
+      method: POST
+      body: '{"username":"{{ waf_user }}", "password":"{{ waf_password }}"}'
+      body_format: json
+      headers:
+        Content-Type: "application/json"
+    register: token
+  - debug:
+      msg: "{{token.json}}"
+
+### WAF Security_Policy
+  - name: Creating a Security Policy
+    uri:
+      url: http://{{ waf_url }}/security-policies
+      method: POST
+      user: "{{ token.json.token }}"
+      password: ""
+      force_basic_auth: yes
+      body: '{"based-on": "default", "name": "custom_policy_1"}'
+      body_format: json
+      headers:
+        Content-Type: "application/json"
+      status_code: 201, 404, 406
+      timeout: 90
+    register: sec_policy
+  - debug:
+      msg: "{{ sec_policy.json }}"
+
+### GET checkpoints
+  - name: Getting the information on the checkpoints
+    uri:
+      url: http://{{ waf_url }}/configuration-checkpoints
+      method: GET
+      user: "{{ token.json.token }}"
+      password: ""
+      force_basic_auth: yes
+      headers:
+        Content-Type: "application/json"
+      status_code: 200,404
+    register: data  
+  - name: debug
+    debug:
+      msg: "{{data.json}}"
+
+### Export the base checkpoint
+  - name: Exporting the checkpoint
+    uri:
+      url: http://{{ waf_url }}/ops/export-configuration
+      method: POST
+      user: "{{ token.json.token }}"
+      password: ""
+      force_basic_auth: yes
+      body: '{"backup-type" : "partial", "name" : "base_config_test"}'
+      body_format: json
+      headers:
+        Content-Type: "application/json"
+      timeout: 120
+      dest: "{{ dst_dir }}"
+      register: status
+  - name: debug
+    debug:
+      msg: "status"
+
+### Commiting to Github repo
+  - name: Adding the file
+    shell: git add .
+  - name: Committing
+    shell: git commit -m "new configuration"
+  - name: Git Push
+    shell: git push origin master
+    register: stdout
+  
