@@ -32,6 +32,38 @@
     register: token
   - debug:
       msg: "{{token.json}}"
+### Creating a new checkpoint
+  - name: Creating a new checkpoint
+    uri:
+      url: http://{{ waf_url }}/configuration-checkpoints
+      method: POST
+      user: "{{ token.json.token }}"
+      password: ""
+      force_basic_auth: yes
+      body: '{"name":"config_checkpoint_custom_policy", "comment" : "Record of the configuration changes after the custom security policy"}'
+      body_format: json
+      headers:
+        Content-Type: "application/json"
+      status_code: 201, 404, 406
+      timeout: 120
+    register: data
+  - debug:
+      msg: "{{ data.json }}"
+### GET checkpoints
+  - name: Getting the information on the checkpoints
+    uri:
+      url: http://{{ waf_url }}/configuration-checkpoints
+      method: GET
+      user: "{{ token.json.token }}"
+      password: ""
+      force_basic_auth: yes
+      headers:
+        Content-Type: "application/json"
+      status_code: 200,404
+    register: data  
+  - name: debug
+    debug:
+      msg: "{{data.json}}"
 
 ### WAF Security_Policy
   - name: Creating a Security Policy
@@ -51,31 +83,15 @@
   - debug:
       msg: "{{ sec_policy.json }}"
 
-### GET checkpoints
-  - name: Getting the information on the checkpoints
-    uri:
-      url: http://{{ waf_url }}/configuration-checkpoints
-      method: GET
-      user: "{{ token.json.token }}"
-      password: ""
-      force_basic_auth: yes
-      headers:
-        Content-Type: "application/json"
-      status_code: 200,404
-    register: data  
-  - name: debug
-    debug:
-      msg: "{{data.json}}"
-
-### Export the base checkpoint
-  - name: Exporting the checkpoint
+### Export the configuration changes
+  - name: Exporting the configuration JSON
     uri:
       url: http://{{ waf_url }}/ops/export-configuration
       method: POST
       user: "{{ token.json.token }}"
       password: ""
       force_basic_auth: yes
-      body: '{"backup-type" : "partial", "name" : "base_config_test"}'
+      body: '{"backup-type" : "partial", "name" : "config_checkpoint_custom_policy"}'
       body_format: json
       headers:
         Content-Type: "application/json"
