@@ -103,14 +103,14 @@
     #  msg: "status"
 
 ### Commiting to Github repo
-  - name: Adding the configuration changes to cloned repo...
+  - name: Adding the configuration changes to GitHub
     shell: git add .
-  - name: Committing to github repo...
+  #- name: Committing to github repo...
     shell: git commit -m "new configuration"
-  - name: Code pushed to github repo...
+  #- name: Code pushed to github repo...
     shell: git push origin master
     register: shell_result
-  - debug: msg="shell_result.stderr"
+  - debug: msg="{{ shell_result.stderr }}"
   - debug: msg="Task complete"
   
 
