@@ -30,8 +30,8 @@
       headers:
         Content-Type: "application/json"
     register: token
-  - debug:
-      msg: "{{token.json}}"
+  #- debug:
+   #   msg: "{{token.json}}"
 ### Creating a new checkpoint
   - name: Creating a new checkpoint
     uri:
@@ -111,7 +111,7 @@
     shell: git push origin master
     register: shell_result
   - debug: 
-      var: shell_result.stdout_lines
+      var: shell_result.output
   
 
 
