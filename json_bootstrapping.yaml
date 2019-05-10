@@ -110,8 +110,8 @@
   - name: Code pushed to github repo...
     shell: git push origin master
     register: git
-  - name: debug
-    debug: var=git.stdout_lines
+  - debug: msg=git.stdout_lines
+  
 
 
   
