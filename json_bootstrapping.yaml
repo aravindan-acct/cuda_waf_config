@@ -40,7 +40,7 @@
       user: "{{ token.json.token }}"
       password: ""
       force_basic_auth: yes
-      body: '{"name":"config_checkpoint_custom_policy", "comment" : "Record of the configuration changes after the custom security policy"}'
+      body: '{"name":"config_checkpoint_rule_group", "comment" : "Record of the configuration changes after the custom security policy"}'
       body_format: json
       headers:
         Content-Type: "application/json"
@@ -66,14 +66,14 @@
       msg: "{{data.json}}"
 
 ### WAF Security_Policy
-  - name: Creating a Security Policy
+  - name: Creating a Content Rule
     uri:
-      url: http://{{ waf_url }}/security-policies
+      url: http://{{ waf_url }}/services/botdemo/content-rules
       method: POST
       user: "{{ token.json.token }}"
       password: ""
       force_basic_auth: yes
-      body: '{"based-on": "default", "name": "custom_policy_1"}'
+      body: '{ "app-id": "botdemo_test", "url-match": "/*", "web-firewall-policy": "default", "status": "On", "mode": "Passive", "name": "rulegroup", "access-log": "Enable", "host-match": "api.botdemo.com"}'
       body_format: json
       headers:
         Content-Type: "application/json"
@@ -91,7 +91,7 @@
       user: "{{ token.json.token }}"
       password: ""
       force_basic_auth: yes
-      body: '{"backup-type" : "partial", "name" : "config_checkpoint_custom_policy"}'
+      body: '{"backup-type" : "partial", "name" : "config_checkpoint_rule_group"}'
       body_format: json
       headers:
         Content-Type: "application/json"
@@ -105,13 +105,10 @@
 ### Commiting to Github repo
   - name: Adding the configuration changes to GitHub
     shell: git add .
-  #- name: Committing to github repo...
-    shell: git commit -m "new configuration"
-  #- name: Code pushed to github repo...
-    shell: git push origin master
+  - shell: git commit -m "new configuration"
+  - shell: git push origin master
     register: shell_result
   - debug: msg="{{ shell_result.stderr }}"
-  - debug: msg="Task complete"
   
 
 
