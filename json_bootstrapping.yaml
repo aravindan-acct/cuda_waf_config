@@ -109,8 +109,9 @@
     shell: git commit -m "new configuration"
   - name: Code pushed to github repo...
     shell: git push origin master
-    register: git
-  - debug: msg=git.stdout_lines
+    register: shell_result
+  - debug: 
+      var: shell_result.stdout_lines
   
 
 
