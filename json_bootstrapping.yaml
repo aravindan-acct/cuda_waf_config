@@ -110,9 +110,7 @@
   - name: Code pushed to github repo...
     shell: git push origin master
     register: shell_result
-  - debug: 
-      var: shell_result.stdout
-
+  - debug: msg="{{ shell_result.stdout }}"
   
 
 
