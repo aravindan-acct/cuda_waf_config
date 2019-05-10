@@ -47,8 +47,8 @@
       status_code: 201, 404, 406
       timeout: 120
     register: data
-  - debug:
-      msg: "{{ data.json }}"
+  #- debug:
+   #   msg: "{{ data.json }}"
 ### GET checkpoints
   - name: Getting the information on the checkpoints
     uri:
@@ -111,7 +111,8 @@
     shell: git push origin master
     register: shell_result
   - debug: 
-      var: shell_result.output
+      var: shell_result.stdout
+
   
 
 
