@@ -80,8 +80,8 @@
       status_code: 201, 404, 406
       timeout: 90
     register: sec_policy
-  - debug:
-      msg: "{{ sec_policy.json }}"
+  #- debug:
+   #   msg: "{{ sec_policy.json }}"
 
 ### Export the configuration changes
   - name: Exporting the configuration JSON
@@ -95,19 +95,23 @@
       body_format: json
       headers:
         Content-Type: "application/json"
-      timeout: 120
+      timeout: 180
       dest: "{{ dst_dir }}"
-      register: status
-  - name: debug
-    debug:
-      msg: "status"
+      register: data
+  #- name: debug
+   # debug:
+    #  msg: "status"
 
 ### Commiting to Github repo
-  - name: Adding the file
+  - name: Adding the configuration changes to cloned repo...
     shell: git add .
-  - name: Committing
+  - name: Committing to github repo...
     shell: git commit -m "new configuration"
-  - name: Git Push
+  - name: Code pushed to github repo...
     shell: git push origin master
-    register: stdout
+    register: git
+  - name: debug
+    debug: var=git.stdout_lines
+
+
   
